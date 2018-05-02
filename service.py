@@ -1,13 +1,7 @@
 from tkinter import *
+from aux import *
 
 class Application(Frame):
-
-    def secondsToTime(self, t):
-        h = int(t / 3600)
-        m = int((t - h * 3600) / 60)
-        s = int(t - h * 3600 - m * 60)
-
-        return "%02d:%02d:%02d" % (h, m, s)
 
     def decrementTimers(self):
         for x in self.orders:
@@ -17,7 +11,7 @@ class Application(Frame):
 
         selectedOrder = self.selectedOrder
         if selectedOrder != None:
-            self.info["timer"].set("ETA: " + self.secondsToTime(selectedOrder["timer"]))
+            self.info["timer"].set("ETA: " + secondsToTime(selectedOrder["timer"]))
 
         self.root.after(1000, self.decrementTimers)
 
@@ -62,7 +56,7 @@ class Application(Frame):
         self.info["name"].set("Customer: " + order["name"])
         self.info["phone"].set("Phone: " + order["phone"])
         self.info["stage"].set("Stage: " + self.stages[order["stage"]])
-        self.info["timer"].set("ETA: " + self.secondsToTime(order["timer"]))
+        self.info["timer"].set("ETA: " + secondsToTime(order["timer"]))
 
     def createInfoWidget(self):
         self.infoframe = Frame(self.main)
