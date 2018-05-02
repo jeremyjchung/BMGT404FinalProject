@@ -2,20 +2,41 @@ from tkinter import *
 
 class Application(Frame):
 
+    def secondsToTime(self, t):
+        h = int(t / 3600)
+        m = int((t - h * 3600) / 60)
+        s = int(t - h * 3600 - m * 60)
+
+        return "%02d:%02d:%02d" % (h, m, s)
+
+    def decrementTimers(self):
+        for x in self.orders:
+            order = self.orders[x]
+            if order["timer"] > 0:
+                order["timer"] -= 1
+
+        selectedOrder = self.selectedOrder
+        if selectedOrder != None:
+            self.info["timer"].set("ETA: " + self.secondsToTime(selectedOrder["timer"]))
+
+        self.root.after(1000, self.decrementTimers)
+
     def populateOrders(self):
         self.orders[1919] = {
             "id": 1919,
             "food": [("pizza", 1), ("hotdog", 2)],
             "name": "Charles",
             "phone": "1111111111",
-            "stage": 2
+            "stage": 2,
+            "timer": 350
         }
         self.orders[2234] = {
             "id": 2234,
             "food": [("sandwich", 2), ("burger", 2)],
             "name": "Chucky",
             "phone": "1111111111",
-            "stage": 3
+            "stage": 3,
+            "timer": 300
         }
 
     def createListboxWidget(self):
@@ -31,30 +52,35 @@ class Application(Frame):
         for i in self.orders:
             self.LISTBOX.insert(END, i)
 
-    def orderToString(self, order):
-        lst = []
-        lst.append(("ID: " + str(order["id"])))
-        lst.append(("Customer: " + order["name"]))
-        lst.append(("Phone: " + order["phone"]))
-        lst.append(("Stage: " + self.stages[order["stage"]]))
-
-        return "\n".join(lst)
-
     def onselect(self, e):
         w = e.widget
         i = int(w.curselection()[0])
         order = self.orders[w.get(i)]
-        self.info.set(self.orderToString(order))
+        self.selectedOrder = order
+
+        self.info["id"].set("ID: " + str(order["id"]))
+        self.info["name"].set("Customer: " + order["name"])
+        self.info["phone"].set("Phone: " + order["phone"])
+        self.info["stage"].set("Stage: " + self.stages[order["stage"]])
+        self.info["timer"].set("ETA: " + self.secondsToTime(order["timer"]))
 
     def createInfoWidget(self):
         self.infoframe = Frame(self.main)
-        self.infoframe.pack({"side": "left"})
+        self.infoframe.pack({"side": "top"})
 
-        self.INFOLABEL = Label(self.main, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT)
+        self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT)
         self.INFOLABEL.pack({"side": "top"})
 
-        self.INFO = Label(self.main, textvariable=self.info, justify=LEFT)
-        self.INFO.pack({"side": "top"})
+        self.ID = Label(self.infoframe, textvariable=self.info["id"], justify=LEFT)
+        self.ID.pack({"side": "top"})
+        self.CUSTOMER = Label(self.infoframe, textvariable=self.info["name"], justify=LEFT)
+        self.CUSTOMER.pack({"side": "top"})
+        self.PHONE = Label(self.infoframe, textvariable=self.info["phone"], justify=LEFT)
+        self.PHONE.pack({"side": "top"})
+        self.STAGE = Label(self.infoframe, textvariable=self.info["stage"], justify=LEFT)
+        self.STAGE.pack({"side": "top"})
+        self.TIMER = Label(self.infoframe, textvariable=self.info["timer"], justify=LEFT)
+        self.TIMER.pack({"side": "top"})
 
     def createWidgets(self):
         self.main = Frame(self.root, bd=1, relief="solid")
@@ -74,12 +100,13 @@ class Application(Frame):
         self.root = Tk()
 
         self.orders = {}
+        self.selectedOrder = None
         self.stages = ["idle", "prep", "cook", "assemble", "complete"]
-        self.populateOrders()
-        self.info = StringVar()
-        self.info.set("Order Info Display")
+        self.info = {"id": StringVar(), "name": StringVar(), "phone": StringVar(), "stage": StringVar(), "timer": StringVar()}
 
+        self.populateOrders()
         self.createWidgets()
+        self.decrementTimers()
 
         self.root.mainloop()
 
