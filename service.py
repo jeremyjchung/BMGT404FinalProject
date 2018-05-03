@@ -1,5 +1,6 @@
 from tkinter import *
 from aux import *
+from notifications import *
 
 class Application(Frame):
 
@@ -20,17 +21,17 @@ class Application(Frame):
             "id": 1919,
             "food": [("pizza", 1), ("hotdog", 2)],
             "name": "Charles",
-            "phone": "1111111111",
-            "stage": 2,
+            "phone": "111-111-1111",
+            "stage": 0,
             "timer": 350
         }
         self.orders[2234] = {
             "id": 2234,
             "food": [("sandwich", 2), ("burger", 2)],
             "name": "Chucky",
-            "phone": "1111111111",
-            "stage": 3,
-            "timer": 300
+            "phone": "111-111-1111",
+            "stage": 1,
+            "timer": 120
         }
 
     def createListboxWidget(self):
@@ -56,25 +57,72 @@ class Application(Frame):
         self.info["name"].set("Customer: " + order["name"])
         self.info["phone"].set("Phone: " + order["phone"])
         self.info["stage"].set("Stage: " + self.stages[order["stage"]])
+        self.info["food"].set("Food: \n" + foodToStr(order["food"]))
         self.info["timer"].set("ETA: " + secondsToTime(order["timer"]))
+
+        for i in range(0, order["stage"]):
+            self.info["progress"][i].set(1)
+        for i in range(order["stage"], len(self.stages)):
+            self.info["progress"][i].set(0)
 
     def createInfoWidget(self):
         self.infoframe = Frame(self.main)
-        self.infoframe.pack({"side": "top"})
+        self.infoframe.pack({"side": "left", "anchor": "n"})
 
         self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT)
         self.INFOLABEL.pack({"side": "top"})
 
-        self.ID = Label(self.infoframe, textvariable=self.info["id"], justify=LEFT)
-        self.ID.pack({"side": "top"})
+        self.ID = Label(self.infoframe, textvariable=self.info["id"])
+        self.ID.pack({"side": "top", "anchor": "w"})
         self.CUSTOMER = Label(self.infoframe, textvariable=self.info["name"], justify=LEFT)
-        self.CUSTOMER.pack({"side": "top"})
+        self.CUSTOMER.pack({"side": "top", "anchor": "w"})
         self.PHONE = Label(self.infoframe, textvariable=self.info["phone"], justify=LEFT)
-        self.PHONE.pack({"side": "top"})
+        self.PHONE.pack({"side": "top", "anchor": "w"})
         self.STAGE = Label(self.infoframe, textvariable=self.info["stage"], justify=LEFT)
-        self.STAGE.pack({"side": "top"})
+        self.STAGE.pack({"side": "top", "anchor": "w"})
+        self.FOOD = Label(self.infoframe, textvariable=self.info["food"], justify=LEFT)
+        self.FOOD.pack({"side": "top", "anchor": "w"})
         self.TIMER = Label(self.infoframe, textvariable=self.info["timer"], justify=LEFT)
-        self.TIMER.pack({"side": "top"})
+        self.TIMER.pack({"side": "top", "anchor": "w"})
+
+    def createCheckboxWidget(self):
+        self.checkboxframe = Frame(self.main)
+        self.checkboxframe.pack({"side": "top", "anchor": "n"})
+
+        self.CHECKBOXLABEL = Label(self.checkboxframe, width=30, bd=1, relief="solid", justify=LEFT, text="Order Progress")
+        self.CHECKBOXLABEL.pack({"side": "top"})
+
+        self.PREP = Checkbutton(self.checkboxframe, text="Prep", variable=self.info["progress"][0], command=self.checkboxListener)
+        self.PREP.pack({"side": "top", "anchor": "w"})
+        self.COOK = Checkbutton(self.checkboxframe, text="Cook", variable=self.info["progress"][1], command=self.checkboxListener)
+        self.COOK.pack({"side": "top", "anchor": "w"})
+        self.ASSEMBLE = Checkbutton(self.checkboxframe, text="Assemble", variable=self.info["progress"][2], command=self.checkboxListener)
+        self.ASSEMBLE.pack({"side": "top", "anchor": "w"})
+
+        self.buttonframe = Frame(self.main)
+        self.buttonframe.pack({"side": "bottom", "anchor": "w"})
+
+        self.COMPLETE = Button(self.buttonframe, text="Complete", command=lambda: self.sendText(complete=True))
+        self.COMPLETE.pack({"side": "left", "anchor": "w"})
+
+        self.TEXT = Button(self.buttonframe, text="Send Text", command=self.sendText)
+        self.TEXT.pack({"side": "left", "anchor": "w"})
+
+    def sendText(self, complete=False):
+        if self.selectedOrder == None:
+            return
+
+        p = "+1" + self.selectedOrder["phone"].replace("-", "")
+        if complete:
+            self.n.send_msg(p, "Your order is ready for pickup!")
+        else:
+            self.n.send_msg(p, "Your order is in the " + self.stages[self.selectedOrder["stage"]] + " phase. ETA " + secondsToTime(self.selectedOrder["timer"]))
+
+    def checkboxListener(self):
+        if self.selectedOrder != None:
+            self.selectedOrder["stage"] = 0
+            for x in self.info["progress"]:
+                self.selectedOrder["stage"] += x.get()
 
     def createWidgets(self):
         self.main = Frame(self.root, bd=1, relief="solid")
@@ -84,6 +132,7 @@ class Application(Frame):
 
         self.createListboxWidget()
         self.createInfoWidget()
+        self.createCheckboxWidget()
 
         self.QUIT = Button(self.bottom)
         self.QUIT["text"] = "Quit"
@@ -92,11 +141,13 @@ class Application(Frame):
 
     def __init__(self):
         self.root = Tk()
+        self.root.title = "Order Magic"
 
+        self.n = Notifications()
         self.orders = {}
         self.selectedOrder = None
-        self.stages = ["idle", "prep", "cook", "assemble", "complete"]
-        self.info = {"id": StringVar(), "name": StringVar(), "phone": StringVar(), "stage": StringVar(), "timer": StringVar()}
+        self.stages = ["prep", "cook", "assemble"]
+        self.info = {"id": StringVar(), "name": StringVar(), "phone": StringVar(), "stage": StringVar(), "timer": StringVar(), "food": StringVar(), "progress": [IntVar(), IntVar(), IntVar(), IntVar()]}
 
         self.populateOrders()
         self.createWidgets()

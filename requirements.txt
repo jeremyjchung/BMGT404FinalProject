@@ -1,6 +1,9 @@
 certifi==2018.4.16
 chardet==3.0.4
+Django==2.0.5
 idna==2.6
+image==1.5.20
+Pillow==5.0.0
 PyJWT==1.6.1
 PySocks==1.6.8
 pytz==2018.4
