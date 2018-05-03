@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from aux import *
 from notifications import *
 
@@ -23,15 +24,17 @@ class Application(Frame):
             "name": "Charles",
             "phone": "111-111-1111",
             "stage": 0,
-            "timer": 350
+            "timer": 350,
+            "eta": 350
         }
         self.orders[2234] = {
             "id": 2234,
             "food": [("sandwich", 2), ("burger", 2)],
             "name": "Chucky",
             "phone": "111-111-1111",
-            "stage": 1,
-            "timer": 120
+            "stage": 0,
+            "timer": 120,
+            "eta": 120
         }
 
     def createListboxWidget(self):
@@ -62,7 +65,7 @@ class Application(Frame):
 
         for i in range(0, order["stage"]):
             self.info["progress"][i].set(1)
-        for i in range(order["stage"], len(self.stages)):
+        for i in range(order["stage"], len(self.stages)-1):
             self.info["progress"][i].set(0)
 
     def createInfoWidget(self):
@@ -102,27 +105,44 @@ class Application(Frame):
         self.buttonframe = Frame(self.main)
         self.buttonframe.pack({"side": "bottom", "anchor": "w"})
 
-        self.COMPLETE = Button(self.buttonframe, text="Complete", command=lambda: self.sendText(complete=True))
-        self.COMPLETE.pack({"side": "left", "anchor": "w"})
-
         self.TEXT = Button(self.buttonframe, text="Send Text", command=self.sendText)
         self.TEXT.pack({"side": "left", "anchor": "w"})
 
-    def sendText(self, complete=False):
+    def sendText(self):
         if self.selectedOrder == None:
             return
 
         p = "+1" + self.selectedOrder["phone"].replace("-", "")
-        if complete:
-            self.n.send_msg(p, "Your order is ready for pickup!")
-        else:
-            self.n.send_msg(p, "Your order is in the " + self.stages[self.selectedOrder["stage"]] + " phase. ETA " + secondsToTime(self.selectedOrder["timer"]))
+        try:
+            if self.selectedOrder["stage"] == 3:
+                self.n.send_msg(p, "Your order is ready for pickup!")
+            else:
+                self.n.send_msg(p, "Your order is in the " + self.stages[self.selectedOrder["stage"]] + " phase. ETA " + secondsToTime(self.selectedOrder["timer"]))
+
+            messagebox.showinfo("Success", "Text has been sent to " + self.selectedOrder["phone"])
+        except:
+            messagebox.showerror("Error", "Text failed to reach " + self.selectedOrder["phone"])
 
     def checkboxListener(self):
         if self.selectedOrder != None:
             self.selectedOrder["stage"] = 0
-            for x in self.info["progress"]:
-                self.selectedOrder["stage"] += x.get()
+            for x in range(0, len(self.info["progress"])):
+                if self.info["progress"][x].get() == 1:
+                    self.selectedOrder["stage"] = x + 1
+
+            for x in range(0, self.selectedOrder["stage"]):
+                self.info["progress"][x].set(1)
+
+            self.info["stage"].set("Stage: " + self.stages[self.selectedOrder["stage"]])
+            # prep = 30%, cook = 60%, assemble = 10%
+            if self.selectedOrder["stage"] == 0:
+                self.selectedOrder["timer"] = self.selectedOrder["eta"]
+            elif self.selectedOrder["stage"] == 1:
+                self.selectedOrder["timer"] = int(0.7*self.selectedOrder["eta"])
+            elif self.selectedOrder["stage"] == 2:
+                self.selectedOrder["timer"] = int(0.1*self.selectedOrder["eta"])
+            else:
+                self.selectedOrder["timer"] = 0
 
     def createWidgets(self):
         self.main = Frame(self.root, bd=1, relief="solid")
@@ -146,8 +166,8 @@ class Application(Frame):
         self.n = Notifications()
         self.orders = {}
         self.selectedOrder = None
-        self.stages = ["prep", "cook", "assemble"]
-        self.info = {"id": StringVar(), "name": StringVar(), "phone": StringVar(), "stage": StringVar(), "timer": StringVar(), "food": StringVar(), "progress": [IntVar(), IntVar(), IntVar(), IntVar()]}
+        self.stages = ["prep", "cook", "assemble", "complete"]
+        self.info = {"id": StringVar(), "name": StringVar(), "phone": StringVar(), "stage": StringVar(), "timer": StringVar(), "food": StringVar(), "progress": [IntVar(), IntVar(), IntVar()]}
 
         self.populateOrders()
         self.createWidgets()
