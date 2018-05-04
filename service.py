@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-from aux import *
+from helper import *
 from notifications import *
 
 class Application(Frame):
