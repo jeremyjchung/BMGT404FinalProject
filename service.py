@@ -5,7 +5,7 @@ from helper import *
 from notifications import *
 import pandas as pd
 
-class Application(Frame):  
+class Application(Frame):
     def decrementTimers(self):
         for x in self.orders:
             order = self.orders[x]
@@ -53,12 +53,12 @@ class Application(Frame):
         self.listboxframe = Frame(self.main)
         self.listboxframe.pack({"side": "left", "anchor": "n"})
 
-        self.LISTBOXLABEL = Label(self.listboxframe, width=10, bd=1, relief="solid", justify=LEFT, text="Orders", font=self.customFont)
+        self.LISTBOXLABEL = Label(self.listboxframe, width=12, bd=1, relief="solid", justify=LEFT, text="Orders", font=self.headerFont)
         self.LISTBOXLABEL.pack({"side": "top", "anchor": "n"})
 
-        self.LISTBOX = Listbox(self.listboxframe, selectmode=SINGLE, width=10)
+        self.LISTBOX = Listbox(self.listboxframe, selectmode=SINGLE, width=14)
         self.LISTBOX.bind('<<ListboxSelect>>', self.onselect)
-        self.LISTBOX.pack({"side": "top", "anchor": "n"})
+        self.LISTBOX.pack({"side": "top", "anchor": "n", "fill": "both", "expand": True})
         for i in self.orders:
             self.LISTBOX.insert(END, i)
 
@@ -85,11 +85,9 @@ class Application(Frame):
         self.infoframe = Frame(self.main)
         self.infoframe.pack({"side": "left", "anchor": "n"})
 
-        self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT, font=self.customFont)
+        self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT, font=self.headerFont)
         self.INFOLABEL.pack({"side": "top"})
 
-        self.ID = Label(self.infoframe, textvariable=self.info["id"])
-        self.ID.pack({"side": "top", "anchor": "w"})
         self.CUSTOMER = Label(self.infoframe, textvariable=self.info["name"], justify=LEFT, font=self.customFont)
         self.CUSTOMER.pack({"side": "top", "anchor": "w"})
         self.PHONE = Label(self.infoframe, textvariable=self.info["phone"], justify=LEFT, font=self.customFont)
@@ -105,7 +103,7 @@ class Application(Frame):
         self.checkboxframe = Frame(self.main)
         self.checkboxframe.pack({"side": "top", "anchor": "n"})
 
-        self.CHECKBOXLABEL = Label(self.checkboxframe, width=30, bd=1, relief="solid", justify=LEFT, text="Order Progress", font=self.customFont)
+        self.CHECKBOXLABEL = Label(self.checkboxframe, width=30, bd=1, relief="solid", justify=LEFT, text="Order Progress", font=self.headerFont)
         self.CHECKBOXLABEL.pack({"side": "top"})
 
         self.PREP = Checkbutton(self.checkboxframe, text="Prep", variable=self.info["progress"][0], command=self.checkboxListener, font=self.customFont)
@@ -174,9 +172,10 @@ class Application(Frame):
 
     def __init__(self):
         self.root = Tk()
-        self.root.title = "Order Magic"
+        self.root.title("Order Magic")
 
-        self.customFont = font.Font(family="Consolas", size=13)        
+        self.headerFont = font.Font(family="Consolas", size=18)
+        self.customFont = font.Font(family="Consolas", size=14)
 
         self.n = Notifications()
         self.orders = {}
