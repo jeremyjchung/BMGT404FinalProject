@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import font
 from helper import *
 from notifications import *
+import pandas as pd
 
-class Application(Frame):
-
+class Application(Frame):  
     def decrementTimers(self):
         for x in self.orders:
             order = self.orders[x]
@@ -18,6 +19,26 @@ class Application(Frame):
         self.root.after(1000, self.decrementTimers)
 
     def populateOrders(self):
+        data = pd.read_csv("CarryOutOrders.csv", skiprows=[1])
+        menu = ['Calzone','Salad','Tots','Stix','Wings','Dessert','Drink']
+        for index,row in data.iterrows():
+            order_id = int(str(id(row))[8:])
+            numItems = 0
+            food = []
+            for item in menu:
+                if isinstance(row[item], int):
+                    numItems += row[item]
+                    food.append((item, row[item]))
+            self.orders[order_id] = {
+                "id": order_id,
+                "food": food,
+                "name": row['Name'],
+                "phone": row['Number'],
+                "stage": 0,
+                "timer": 350,
+                "eta": 350
+            }
+
         self.orders[1919] = {
             "id": 1919,
             "food": [("pizza", 1), ("hotdog", 2)],
@@ -26,15 +47,6 @@ class Application(Frame):
             "stage": 0,
             "timer": 350,
             "eta": 350
-        }
-        self.orders[2234] = {
-            "id": 2234,
-            "food": [("sandwich", 2), ("burger", 2)],
-            "name": "Chucky",
-            "phone": "111-111-1111",
-            "stage": 0,
-            "timer": 120,
-            "eta": 120
         }
 
     def createListboxWidget(self):
@@ -61,6 +73,7 @@ class Application(Frame):
         self.info["phone"].set("Phone: " + order["phone"])
         self.info["stage"].set("Stage: " + self.stages[order["stage"]])
         self.info["food"].set("Food: \n" + foodToStr(order["food"]))
+        print(foodToStr(order["food"]))
         self.info["timer"].set("ETA: " + secondsToTime(order["timer"]))
 
         for i in range(0, order["stage"]):
@@ -69,6 +82,8 @@ class Application(Frame):
             self.info["progress"][i].set(0)
 
     def createInfoWidget(self):
+        self.customFont = font.Font(family="Consolas", size=10)
+
         self.infoframe = Frame(self.main)
         self.infoframe.pack({"side": "left", "anchor": "n"})
 
@@ -83,7 +98,7 @@ class Application(Frame):
         self.PHONE.pack({"side": "top", "anchor": "w"})
         self.STAGE = Label(self.infoframe, textvariable=self.info["stage"], justify=LEFT)
         self.STAGE.pack({"side": "top", "anchor": "w"})
-        self.FOOD = Label(self.infoframe, textvariable=self.info["food"], justify=LEFT)
+        self.FOOD = Label(self.infoframe, textvariable=self.info["food"], justify=LEFT, font=self.customFont)
         self.FOOD.pack({"side": "top", "anchor": "w"})
         self.TIMER = Label(self.infoframe, textvariable=self.info["timer"], justify=LEFT)
         self.TIMER.pack({"side": "top", "anchor": "w"})

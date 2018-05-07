@@ -6,4 +6,4 @@ def secondsToTime(t):
     return "%02d:%02d:%02d" % (h, m, s)
 
 def foodToStr(lst):
-    return "\n".join(list(map(lambda x: x[0] + "\t\t" + str(x[1]), lst)))
+    return "\n".join(list(map(lambda x: str(x[0]).ljust(10) + str(x[1]).rjust(15), lst)))
