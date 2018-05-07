@@ -26,9 +26,9 @@ class Application(Frame):
             numItems = 0
             food = []
             for item in menu:
-                if isinstance(row[item], int) and row[item] > 0:
+                if row[item] > 0:
                     numItems += row[item]
-                    food.append((item, row[item]))
+                    food.append((item, int(row[item])))
             self.orders[order_id] = {
                 "id": order_id,
                 "food": food,
@@ -51,14 +51,14 @@ class Application(Frame):
 
     def createListboxWidget(self):
         self.listboxframe = Frame(self.main)
-        self.listboxframe.pack({"side": "left"})
+        self.listboxframe.pack({"side": "left", "anchor": "n"})
 
-        self.LISTBOXLABEL = Label(self.listboxframe, width=10, bd=1, relief="solid", justify=LEFT, text="Orders")
-        self.LISTBOXLABEL.pack({"side": "top"})
+        self.LISTBOXLABEL = Label(self.listboxframe, width=10, bd=1, relief="solid", justify=LEFT, text="Orders", font=self.customFont)
+        self.LISTBOXLABEL.pack({"side": "top", "anchor": "n"})
 
         self.LISTBOX = Listbox(self.listboxframe, selectmode=SINGLE, width=10)
         self.LISTBOX.bind('<<ListboxSelect>>', self.onselect)
-        self.LISTBOX.pack({"side": "top"})
+        self.LISTBOX.pack({"side": "top", "anchor": "n"})
         for i in self.orders:
             self.LISTBOX.insert(END, i)
 
@@ -82,45 +82,43 @@ class Application(Frame):
             self.info["progress"][i].set(0)
 
     def createInfoWidget(self):
-        self.customFont = font.Font(family="Consolas", size=10)
-
         self.infoframe = Frame(self.main)
         self.infoframe.pack({"side": "left", "anchor": "n"})
 
-        self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT)
+        self.INFOLABEL = Label(self.infoframe, width=30, bd=1, relief="solid", text="Order Detail", justify=LEFT, font=self.customFont)
         self.INFOLABEL.pack({"side": "top"})
 
         self.ID = Label(self.infoframe, textvariable=self.info["id"])
         self.ID.pack({"side": "top", "anchor": "w"})
-        self.CUSTOMER = Label(self.infoframe, textvariable=self.info["name"], justify=LEFT)
+        self.CUSTOMER = Label(self.infoframe, textvariable=self.info["name"], justify=LEFT, font=self.customFont)
         self.CUSTOMER.pack({"side": "top", "anchor": "w"})
-        self.PHONE = Label(self.infoframe, textvariable=self.info["phone"], justify=LEFT)
+        self.PHONE = Label(self.infoframe, textvariable=self.info["phone"], justify=LEFT, font=self.customFont)
         self.PHONE.pack({"side": "top", "anchor": "w"})
-        self.STAGE = Label(self.infoframe, textvariable=self.info["stage"], justify=LEFT)
+        self.STAGE = Label(self.infoframe, textvariable=self.info["stage"], justify=LEFT, font=self.customFont)
         self.STAGE.pack({"side": "top", "anchor": "w"})
         self.FOOD = Label(self.infoframe, textvariable=self.info["food"], justify=LEFT, font=self.customFont)
         self.FOOD.pack({"side": "top", "anchor": "w"})
-        self.TIMER = Label(self.infoframe, textvariable=self.info["timer"], justify=LEFT)
+        self.TIMER = Label(self.infoframe, textvariable=self.info["timer"], justify=LEFT, font=self.customFont)
         self.TIMER.pack({"side": "top", "anchor": "w"})
 
     def createCheckboxWidget(self):
         self.checkboxframe = Frame(self.main)
         self.checkboxframe.pack({"side": "top", "anchor": "n"})
 
-        self.CHECKBOXLABEL = Label(self.checkboxframe, width=30, bd=1, relief="solid", justify=LEFT, text="Order Progress")
+        self.CHECKBOXLABEL = Label(self.checkboxframe, width=30, bd=1, relief="solid", justify=LEFT, text="Order Progress", font=self.customFont)
         self.CHECKBOXLABEL.pack({"side": "top"})
 
-        self.PREP = Checkbutton(self.checkboxframe, text="Prep", variable=self.info["progress"][0], command=self.checkboxListener)
+        self.PREP = Checkbutton(self.checkboxframe, text="Prep", variable=self.info["progress"][0], command=self.checkboxListener, font=self.customFont)
         self.PREP.pack({"side": "top", "anchor": "w"})
-        self.COOK = Checkbutton(self.checkboxframe, text="Cook", variable=self.info["progress"][1], command=self.checkboxListener)
+        self.COOK = Checkbutton(self.checkboxframe, text="Cook", variable=self.info["progress"][1], command=self.checkboxListener, font=self.customFont)
         self.COOK.pack({"side": "top", "anchor": "w"})
-        self.ASSEMBLE = Checkbutton(self.checkboxframe, text="Assemble", variable=self.info["progress"][2], command=self.checkboxListener)
+        self.ASSEMBLE = Checkbutton(self.checkboxframe, text="Assemble", variable=self.info["progress"][2], command=self.checkboxListener, font=self.customFont)
         self.ASSEMBLE.pack({"side": "top", "anchor": "w"})
 
         self.buttonframe = Frame(self.main)
         self.buttonframe.pack({"side": "bottom", "anchor": "w"})
 
-        self.TEXT = Button(self.buttonframe, text="Send Text", command=self.sendText)
+        self.TEXT = Button(self.buttonframe, text="Send Text", command=self.sendText, font=self.customFont)
         self.TEXT.pack({"side": "left", "anchor": "w"})
 
     def sendText(self):
@@ -177,6 +175,8 @@ class Application(Frame):
     def __init__(self):
         self.root = Tk()
         self.root.title = "Order Magic"
+
+        self.customFont = font.Font(family="Consolas", size=13)        
 
         self.n = Notifications()
         self.orders = {}
