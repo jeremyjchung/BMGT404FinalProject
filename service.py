@@ -26,7 +26,7 @@ class Application(Frame):
             numItems = 0
             food = []
             for item in menu:
-                if isinstance(row[item], int):
+                if isinstance(row[item], int) and row[item] > 0:
                     numItems += row[item]
                     food.append((item, row[item]))
             self.orders[order_id] = {
