@@ -30,6 +30,9 @@ phone_entry = Entry(root)
 name_entry.grid(row=3, column=1, sticky=W)
 phone_entry.grid(row=4, column=1, sticky=W)
 
+name_entry.insert(END, 'First Last')
+phone_entry.insert(END, 'XXX-XXX-XXXX')
+
 Label(root, text = "Order Information",bg="red", font = "Helvetica 16 bold").grid(row = 6, column = 0, sticky = W)
 Label(root, text="Calzone", font = "Helvetica").grid(row=8,column = 0, sticky=W)
 Label(root, text="Salad", font = "Helvetica").grid(row=9, column = 0, sticky=W)
@@ -54,6 +57,14 @@ stix_entry.grid(row=11, column=1, sticky=W)
 wings_entry.grid(row=12, column=1, sticky=W)
 dessert_entry.grid(row=13, column=1, sticky=W)
 drink_entry.grid(row=14, column=1, sticky=W)
+
+calzone_entry.insert(END, '0')
+salad_entry.insert(END, '0')
+tots_entry.insert(END, '0')
+stix_entry.insert(END, '0')
+wings_entry.insert(END, '0')
+dessert_entry.insert(END, '0')
+drink_entry.insert(END, '0')
 
 def fetch():
 	name = name_entry.get()
