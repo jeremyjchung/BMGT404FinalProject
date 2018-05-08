@@ -19,9 +19,6 @@ class Application(Frame):
         self.root.after(1000, self.decrementTimers)
 
     def populateOrders(self):
-        #initial_wait_time = int(priority_order[2])*15 + int(priority_order[3])*10 + int(priority_order[4])*10 + \
-        #int(priority_order[5])*10 + int(priority_order[6])*15 + \
-        #int(priority_order[7])*10 + int(priority_order[8])*5
         data = pd.read_csv("CarryOutOrders.csv")
         menu = ['Calzone','Salad','Tots','Stix','Wings','Dessert','Drink']
         for index,row in data.iterrows():
@@ -31,25 +28,16 @@ class Application(Frame):
                 if row[item] > 0:
                     numItems += row[item]
                     food.append((item, int(row[item])))
+            time = calculateOrderTime(food)
             self.orders[index] = {
                 "id": index,
                 "food": food,
                 "name": row['Name'],
                 "phone": row['Number'],
                 "stage": 0,
-                "timer": 350,
-                "eta": 350
+                "timer": time,
+                "eta": time
             }
-
-        self.orders[1919] = {
-            "id": 1919,
-            "food": [("pizza", 1), ("hotdog", 2)],
-            "name": "Charles",
-            "phone": "111-111-1111",
-            "stage": 0,
-            "timer": 350,
-            "eta": 350
-        }
 
     def createListboxWidget(self):
         self.listboxframe = Frame(self.main)
