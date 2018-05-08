@@ -89,13 +89,13 @@ def fetch():
 	csv_file = 'CarryOutOrders.csv'
 	
 	if os.path.exists(csv_file):
-		with open(csv_file, 'r+') as csvfile:
+		with open(csv_file, 'r+', newline='') as csvfile:
 			header = next(csv.reader(csvfile))
 			writer = csv.DictWriter(csvfile, header, -999)
 			writer.writerow(order)		
 	else:
 		try:
-			with open(csv_file, 'w') as csvfile:
+			with open(csv_file, 'w', newline='') as csvfile:
 				writer = csv.DictWriter(csvfile, fieldnames=fields)
 				writer.writeheader()
 				writer.writerow(order)

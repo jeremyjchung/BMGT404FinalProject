@@ -19,18 +19,20 @@ class Application(Frame):
         self.root.after(1000, self.decrementTimers)
 
     def populateOrders(self):
-        data = pd.read_csv("CarryOutOrders.csv", skiprows=[1])
+        #initial_wait_time = int(priority_order[2])*15 + int(priority_order[3])*10 + int(priority_order[4])*10 + \
+        #int(priority_order[5])*10 + int(priority_order[6])*15 + \
+        #int(priority_order[7])*10 + int(priority_order[8])*5
+        data = pd.read_csv("CarryOutOrders.csv")
         menu = ['Calzone','Salad','Tots','Stix','Wings','Dessert','Drink']
         for index,row in data.iterrows():
-            order_id = int(str(id(row))[8:])
             numItems = 0
             food = []
             for item in menu:
                 if row[item] > 0:
                     numItems += row[item]
                     food.append((item, int(row[item])))
-            self.orders[order_id] = {
-                "id": order_id,
+            self.orders[index] = {
+                "id": index,
                 "food": food,
                 "name": row['Name'],
                 "phone": row['Number'],
