@@ -22,7 +22,7 @@ def calculateOrderTime(food):
         elif item == 'Tots':
             time += 360 + 120*quantity
         elif item == 'Stix':
-            time += 480 
+            time += 480 + 90*quantity 
         elif item == 'Wings':
             time += 420 + 240*quantity
         elif item == 'Dessert':
